@@ -47,6 +47,16 @@ conn.commit()
 conn.close()
 
 
+# Function to validate a URL
+def is_valid_url(url):
+    try:
+        response = requests.get(url)
+        return True  # Return True if the URL is reachable (status code 200)
+    except requests.exceptions.RequestException:
+        print(f"Original URL is not reachable")
+        return False  # Return False if the URL is not reachable
+
+
 # Endpoint to purge (delete) all records from the database using a GET request
 @app.route('/purge', methods=['GET'])
 def purge_database():
@@ -93,14 +103,14 @@ def generate_short_url(original_url):
 
 @app.route('/')
 def home():
-    return app.send_static_file("events.html")
+    return app.send_static_file("url_short.html")
 
 # Endpoint to shorten a URL using a GET request
 @app.route('/shorten', methods=['GET'])
 def shorten_url():
     original_url = request.args.get('original_url')
     
-    if original_url:
+    if original_url and is_valid_url(original_url):
         # Generate a unique shortened URL
         short_url = generate_short_url(original_url)
         
@@ -119,8 +129,8 @@ def shorten_url():
         response_data = {"short_url": short_url}
         print(f"Response: {response_data}")
         return jsonify(response_data)
-
-    return jsonify({"error": "Invalid data"}), 400
+    else:
+        return jsonify({"error": "Invalid URL"}), 400
 
 
 
@@ -136,14 +146,13 @@ def redirect_to_original(short_url):
     
     if result:
         original_url = result[0]
-        # Print debug messages
         print(f"Redirecting to Original URL: {original_url}")
         return redirect(original_url, code=302)
     
-    # Print debug message
     print("Short URL not found")
-    
-    return jsonify({"error": "URL not found"}), 404
+
+    # Short URL not found, render the error.html page
+    return app.send_static_file("error.html")
 
 
 
@@ -161,7 +170,6 @@ def list_urls():
     
     urls = [{"original_url": row[0], "short_url": row[1]} for row in result]
     
-    # Print debug messages
     print("List of URLs:")
     for url in urls:
         print(f"Original URL: {url['original_url']}, Short URL: {url['short_url']}")
