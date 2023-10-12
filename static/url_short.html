@@ -42,11 +42,26 @@
         const shortenButton = document.getElementById('shorten-button');
         const urlInput = document.getElementById('url-input');
         const shortenedUrl = document.getElementById('shortened-url');
+
+        // Get the protocol (http or https)
+        const protocol = window.location.protocol;
+
+        // Get the hostname (host without the port)
+        const host = window.location.hostname;
+
+        // Get the port (e.g., 8080) and use it only if it's not the default (80 for HTTP, 443 for HTTPS)
+        const port = window.location.port;
+        const portString = (port && port !== "80" && port !== "443") ? `:${port}` : "";
+
+        // Construct the base URL
+        const baseUrl = `${protocol}//${host}${portString}`;
+
+        // Now, `baseUrl` contains the base URL of the current page
+        console.log(baseUrl);
         
         shortenButton.addEventListener('click', () => {
             const originalUrl = urlInput.value;
-            // Replace with your actual API endpoint
-            const apiUrl = `http://127.0.0.1:8080/shorten?original_url=${originalUrl}`;
+            const apiUrl = `${baseUrl}/shorten?original_url=${originalUrl}`;
         
             // Send a GET request to the API to shorten the URL
             fetch(apiUrl)
@@ -59,7 +74,7 @@
                 .then(data => {
                     // Check if the response contains a 'short_url' property
                     if (data.hasOwnProperty('short_url')) {
-                        shortenedUrl.textContent = `Shortened URL: http://127.0.0.1:8080/${data.short_url}`;
+                        shortenedUrl.textContent = 'Shortened URL:' + `${baseUrl}/${data.short_url}`;
                     } else {
                         shortenedUrl.textContent = 'Error: Unable to shorten the URL or The URL entered was incorrect';
                     }
