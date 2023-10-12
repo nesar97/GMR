@@ -61,11 +61,11 @@
                     if (data.hasOwnProperty('short_url')) {
                         shortenedUrl.textContent = `Shortened URL: http://127.0.0.1:8080/${data.short_url}`;
                     } else {
-                        shortenedUrl.textContent = 'Error: Unable to shorten the URL';
+                        shortenedUrl.textContent = 'Error: Unable to shorten the URL or The URL entered was incorrect';
                     }
                 })
                 .catch(error => {
-                    shortenedUrl.textContent = 'Error: Unable to shorten the URL';
+                    shortenedUrl.textContent = 'Error: Unable to shorten the URL or The URL entered was incorrect';
                 });
         });
     </script>
