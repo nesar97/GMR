@@ -6,6 +6,7 @@ import sqlite3
 import string
 import time
 import string
+import random
 
 # Define the base62 character set
 BASE62_CHARS = string.ascii_letters + string.digits
@@ -77,7 +78,8 @@ def generate_short_url(original_url):
     while True:
         # Generate a short URL based on a timestamp
         timestamp = int(time.time())
-        short_url = base62_encode(timestamp)
+        random_component = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+        short_url = base62_encode(timestamp) + random_component
 
         # Check if the generated short URL already exists in the database
         cursor.execute('SELECT COUNT(*) FROM urls WHERE short_url = ?', (short_url,))
